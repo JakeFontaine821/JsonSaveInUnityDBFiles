@@ -4,12 +4,13 @@ var path = require("path");
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var port = process.env.port||3000;
+var db = require("./config/database");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.json());
 
-mongoose.connect("mongodb://127.0.0.1:27017/gameEntries",{
+mongoose.connect(db.mongoURI,{
     useNewURLParser:true
 }).then(function(){
     console.log("Connected to MongoDB Database");
