@@ -13,7 +13,13 @@
             <a href="index.html">Go to entry page</a>
         </nav>
 
-        <p>List games here</p>
+        <p>List games here alphabetically</p>
+
+        <form action="/searchGames" method="post">
+            <input type="text" name="game" id="game" placeholder="Search">
+            <input type="submit">
+        </form>
+        <br>
 
         <script>
             fetch("/getGames").then(function(games){

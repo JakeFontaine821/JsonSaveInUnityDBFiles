@@ -40,7 +40,7 @@ app.post("/saveGame", function(req, res){
 })
 
 app.get("/getGames", function(req, res){
-    Game.find({}).then(function(game){
+    Game.find({}).sort({"game":1}).then(function(game){
        // console.log({game});
         res.json({game});
     })
@@ -61,6 +61,19 @@ app.post("/updateGame", function(req, res){
     console.log(req.body);
     Game.findByIdAndUpdate(req.body.id, {game:req.body.game}, function(){
         res.redirect("gameList.html");
+    })
+})
+
+app.post("/searchGames", function(req, res){
+    console.log(req.body.game);
+    //res.redirect("searched.html?game=" + req.body.game);
+
+    Game.find({"game":req.body.game}).then(function(game){
+        //console.log(game[0].game);
+        //res.redirect("searched.html?game=" + game);
+        res.redirect("searched.html?id=" + game[0]._id + "&game=" + game[0].game);
+    }).catch(function(){
+        res.redirect("searched.html?game=");
     })
 })
 

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search results</title>
+</head>
+<body>
+    <nav>
+        <a href="gameList.html">Go to list page</a>
+    </nav>
+
+    <h1>Search Results</h1>
+    <p id="id"></p>
+    <p id="results"></p>
+    <p id="notFound" style="color: red;"></p>
+
+    <script>
+        var queryData = window.location.search;
+        console.log(queryData);
+        var entries = new URLSearchParams(queryData);
+
+        if(entries.get("game") != ""){
+            document.getElementById("id").innerText = "id = " + entries.get("id");
+            document.getElementById("results").innerText = "Game Name = " + entries.get("game");
+        }
+        else{
+            document.getElementById("notFound").innerText = "Game Not Found.";
+        }
+    </script>
+</body>
+</html>
