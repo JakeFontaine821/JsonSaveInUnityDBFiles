@@ -5,6 +5,7 @@ var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var port = process.env.port||3000;
 var db = require("./config/database");
+const { Console } = require("console");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
@@ -18,63 +19,46 @@ mongoose.connect(db.mongoURI,{
     console.log(err);
 });
 
-require("./modules/Game");
-var Game = mongoose.model("game");
+require("./modules/UnitySchema");
+var UnitySave = mongoose.model("unitySave");
 
-//example routes
-app.get("/", function(req, res){
-    res.redirect("gameList.html");
+//Unity Routes
+app.post("/newUnitySave", function(req, res){
+    //add a .find to make all usernames unique, if username exits, dont add it
+    var newData = {
+        "screenName" : req.body.screenName,
+        "firstName" : req.body.firstName,
+        "lastName" : req.body.lastName,
+        "dateJoined" : req.body.dateJoined,
+        "score" : req.body.score
+    }
+    console.log(newData);
+
+    new UnitySave(newData).save();
 })
 
-app.get("/poop", function(req, res){
-    res.send("AH PPOOOOP NOOO");
+app.get("/saveListUnity", function(req, res){
+    // Send all data to Unity
+    UnitySave.find({}).sort({"screenName":1}).then(function(saves){
+        res.send({saves});
+    })
 })
 
-app.post("/saveGame", function(req, res){
+app.post("/deleteSave", function(req, res){
+    console.log(`Save deleted at ${req.body.variable}`);
+    
+    UnitySave.findByIdAndDelete(req.body.variable).exec();
+})
+
+app.post("/searchSaves", function(req, res){
+    UnitySave.find({"screenName":req.body.variable}).then(function(saves){
+        res.send({saves});
+    })
+})
+
+app.post("/update", function(req, res){
     console.log(req.body);
-
-    new Game(req.body).save().then(function(){
-        //res.send(req.body); 
-        res.redirect("index.html");
-    });
-})
-
-app.get("/getGames", function(req, res){
-    Game.find({}).sort({"game":1}).then(function(game){
-       // console.log({game});
-        res.json({game});
-    })
-})
-
-app.post("/deleteGame", function(req, res){
-    console.log(`Game Deleted ${req.body.game}`);
-    Game.findByIdAndDelete(req.body.game).exec();
-    res.redirect('gameList.html');
-})
-
-app.get("/getID::id", function(req, res){
-    console.log(req.body.game);
-    res.redirect("updatePage.html?id=" + req.params._id);
-})
-
-app.post("/updateGame", function(req, res){
-    console.log(req.body);
-    Game.findByIdAndUpdate(req.body.id, {game:req.body.game}, function(){
-        res.redirect("gameList.html");
-    })
-})
-
-app.post("/searchGames", function(req, res){
-    console.log(req.body.game);
-    //res.redirect("searched.html?game=" + req.body.game);
-
-    Game.find({"game":req.body.game}).then(function(game){
-        //console.log(game[0].game);
-        //res.redirect("searched.html?game=" + game);
-        res.redirect("searched.html?id=" + game[0]._id + "&game=" + game[0].game);
-    }).catch(function(){
-        res.redirect("searched.html?game=");
-    })
+    UnitySave.findByIdAndUpdate(req.body.id, {score:req.body.score}).exec()
 })
 
 app.use(express.static(__dirname+"/pages"));
